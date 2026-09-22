@@ -1,3 +1,33 @@
 spring:
   application:
     name: auth-service
+
+  # Conexion a PostgreSQL
+  datasource:
+    url: jdbc:postgresql://localhost:5433/auth_db
+    username: auth_user
+    password: auth_password
+    driver-class-name: org.postgresql.Driver
+
+  # JPA / Hibernate (ORM)
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: auth
+    show-sql: false
+
+server:
+  port: 8081
+
+# Configuracion JWT
+jwt:
+  access-token-expiration: 900000
+  refresh-token-expiration: 604800000
+  keys-dir: ./keys
+
+logging:
+  level:
+    com.demo.authservice: DEBUG
