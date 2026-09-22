@@ -1,6 +1,6 @@
 # SETUP — Demo Users API (Microservicios)
 
-Java 25 | Spring Boot 4.1 | Angular 22 | Tailwind v4 | PostgreSQL 17 | NGINX | Docker
+Java 25 | Spring Boot 4.1 | .NET 10 | Entity Framework Core 10 | Angular 22 | Tailwind v4 | PostgreSQL 17 | NGINX | Docker
 
 ---
 
@@ -35,6 +35,7 @@ Java 25 | Spring Boot 4.1 | Angular 22 | Tailwind v4 | PostgreSQL 17 | NGINX | D
 | Docker + Compose | 29+ / v5+ | `docker -v && docker compose version` |
 | Java JDK | 25 | `java -version` |
 | Maven | 3.9+ | `mvn -version` |
+| .NET SDK | 10 (LTS) | `dotnet --version` |
 | Node.js | 20+ | `node -v` |
 | pnpm | 10+ | `pnpm -v` |
 | Angular CLI | 22 | `ng version` |
@@ -51,15 +52,15 @@ docker compose up -d postgres-auth postgres-users
 docker compose ps
 
 # Verificar datos de auth-db
-docker compose exec postgres-auth psql -U auth_user -d auth_db -c "SELECT username, email, role FROM users;"
+docker compose exec postgres-auth psql -U auth_user -d auth_db -c "SELECT username, email, role FROM auth.users;"
 
 # Verificar datos de users-db
-docker compose exec postgres-users psql -U users_user -d users_db -c "SELECT first_name, last_name FROM user_profiles;"
+docker compose exec postgres-users psql -U users_user -d users_db -c "SELECT first_name, last_name FROM users.user_profiles;"
 ```
 
 ---
 
-## Paso 2: Levantar auth-service (cuando exista el codigo)
+## Paso 2: Levantar auth-service
 
 ```powershell
 cd auth-service
@@ -70,12 +71,12 @@ mvn spring-boot:run
 
 ---
 
-## Paso 3: Levantar user-service (cuando exista el codigo)
+## Paso 3: Levantar user-service
 
 ```powershell
-cd user-service
-mvn clean package -DskipTests
-mvn spring-boot:run
+cd user-service/UserApi
+dotnet restore
+dotnet run
 # Corre en :8082
 ```
 
@@ -140,13 +141,18 @@ docker compose down -v && docker compose up --build -d
 demo-users-api-latest/
 ├── docker-compose.yml
 ├── nginx/nginx.conf              ← API Gateway config
-├── auth-service/                 ← Spring Boot (JWT REST API)
-├── user-service/                 ← Spring Boot (GraphQL API)
+├── auth-service/                 ← Spring Boot (JWT REST API) - Java
+├── user-service/                 ← .NET solution
+│   ├── UserApi.slnx             ← Solution file
+│   ├── UserApi/                 ← ASP.NET Core (GraphQL API) - .NET 10
+│   └── UserApi.Tests/           ← xUnit tests
 ├── frontend/                     ← Angular 22 + Tailwind v4
 ├── init-scripts/
 │   ├── auth-db/                  ← Schema + seed para auth DB
 │   └── users-db/                 ← Schema + seed para users DB
-└── PLAN.md
+├── QWEN.md                       ← Especificaciones técnicas
+├── README.md                     ← Overview e instalación
+└── PLAN.md                       ← Plan de implementación
 ```
 
 ---
@@ -175,4 +181,104 @@ docker compose exec postgres-auth psql -U auth_user -d auth_db
 
 # Users DB
 docker compose exec postgres-users psql -U users_user -d users_db
+```
+
+---
+
+## Pruebas
+
+### Auth Service (Java)
+```powershell
+cd auth-service
+
+# Tests unitarios
+.\mvnw.cmd test -Dtest=AuthServiceTest
+
+# Tests de integración
+.\mvnw.cmd test -Dtest=AuthControllerIntegrationTest
+
+# Todos los tests
+.\mvnw.cmd test
+```
+
+### User Service (.NET)
+```powershell
+cd user-service
+
+# Correr todas las pruebas
+dotnet test
+
+# Correr con verbose
+dotnet test --verbosity normal
+
+# Correr solo un test específico
+dotnet test --filter "FullyQualifiedName~GetAllUsersAsync_ShouldReturnAllUsers"
+```
+
+---
+
+## Verificación manual
+
+### 1. Registrar usuario (sincronización entre servicios)
+```powershell
+curl -X POST http://localhost:8081/api/auth/register `
+  -H "Content-Type: application/json" `
+  -d "{\"email\":\"test@demo.com\",\"username\":\"testuser\",\"password\":\"test123\"}"
+```
+
+**Esto debería:**
+- Crear usuario en `auth_db.users`
+- Llamar a User Service para crear perfil en `users_db.user_profiles`
+- Retornar access token + refresh token
+
+### 2. Verificar que el perfil se creó en Users DB
+```powershell
+docker compose exec postgres-users psql -U users_user -d users_db -c "SELECT user_id, first_name, last_name FROM users.user_profiles WHERE first_name = 'testuser';"
+```
+
+### 3. Login y obtener JWT
+```powershell
+curl -X POST http://localhost:8081/api/auth/login `
+  -H "Content-Type: application/json" `
+  -d "{\"email\":\"admin@demo.com\",\"password\":\"admin123\"}"
+```
+*Copia el `accessToken` de la respuesta*
+
+### 4. Probar GraphQL con JWT
+```powershell
+# Reemplaza <TOKEN> con el accessToken del paso anterior
+curl -X POST http://localhost:8082/graphql `
+  -H "Content-Type: application/json" `
+  -H "Authorization: Bearer <TOKEN>" `
+  -d "{\"query\":\"query { users { firstName lastName phone bio } }\"}"
+```
+
+### 5. Probar GraphQL sin JWT (debe fallar)
+```powershell
+curl -X POST http://localhost:8082/graphql `
+  -H "Content-Type: application/json" `
+  -d "{\"query\":\"query { users { firstName lastName } }\"}"
+```
+*Debe retornar error de autorización*
+
+### 6. GraphQL Playground (opcional)
+Abre en el browser: `http://localhost:8082/graphql`
+
+Agrega el header en la pestaña "Headers":
+```json
+{
+  "Authorization": "Bearer <TU-TOKEN>"
+}
+```
+
+Ejecuta queries:
+```graphql
+query {
+  users {
+    firstName
+    lastName
+    phone
+    bio
+  }
+}
 ```

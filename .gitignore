@@ -4,6 +4,14 @@ user-service/target/
 *.jar
 *.class
 
+# .NET
+**/bin/
+**/obj/
+*.user
+*.suo
+*.cache
+*.log
+
 # Keys RSA (generadas en runtime)
 keys/
 

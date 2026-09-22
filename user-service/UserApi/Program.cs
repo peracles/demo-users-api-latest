@@ -5,6 +5,8 @@ using UserApi.GraphQL.Queries;
 using UserApi.Security;
 using UserApi.Services;
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Entity Framework Core + PostgreSQL

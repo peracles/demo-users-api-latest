@@ -31,3 +31,8 @@ jwt:
 logging:
   level:
     com.demo.authservice: DEBUG
+
+# URL del User Service (para sincronización de perfiles)
+user-service:
+  url: http://localhost:8082
+  secret: internal-secret-key-2026

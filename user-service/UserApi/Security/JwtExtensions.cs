@@ -13,15 +13,25 @@ public static class JwtExtensions
         var keysDir = configuration["JwtKeysDir"] ?? "./keys";
         var publicKeyPath = System.IO.Path.Combine(keysDir, "public.key");
 
-        if (!File.Exists(publicKeyPath))
+        // Retry: auth-service may not have generated keys yet
+        string publicKeyBase64 = "";
+        for (int i = 0; i < 30; i++)
+        {
+            if (File.Exists(publicKeyPath))
+            {
+                publicKeyBase64 = File.ReadAllText(publicKeyPath).Trim();
+                break;
+            }
+            Thread.Sleep(1000);
+        }
+
+        if (string.IsNullOrEmpty(publicKeyBase64))
         {
             throw new FileNotFoundException(
-                $"JWT public key not found at '{publicKeyPath}'. " +
+                $"JWT public key not found at '{publicKeyPath}' after 30s. " +
                 "Ensure the auth-service has generated the RSA keys.");
         }
 
-        // Leer la clave pública en formato Base64 (X.509 SubjectPublicKeyInfo)
-        var publicKeyBase64 = File.ReadAllText(publicKeyPath).Trim();
         var publicKeyBytes = Convert.FromBase64String(publicKeyBase64);
         var rsa = RSA.Create();
         rsa.ImportSubjectPublicKeyInfo(publicKeyBytes, out _);

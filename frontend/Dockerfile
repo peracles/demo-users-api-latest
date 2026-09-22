@@ -1,8 +1,7 @@
-FROM node:20-alpine
-RUN corepack enable && corepack prepare pnpm@latest --activate
+FROM node:22-alpine
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+COPY package.json ./
+RUN npm install
 COPY . .
 EXPOSE 4200
-CMD ["pnpm", "start", "--host", "0.0.0.0"]
+CMD ["npm", "start"]

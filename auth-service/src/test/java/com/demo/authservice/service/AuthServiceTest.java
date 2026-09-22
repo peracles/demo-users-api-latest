@@ -1,5 +1,6 @@
 package com.demo.authservice.service;
 
+import com.demo.authservice.client.UserServiceClient;
 import com.demo.authservice.model.User;
 import com.demo.authservice.model.dto.*;
 import com.demo.authservice.repository.RefreshTokenRepository;
@@ -27,9 +28,10 @@ class AuthServiceTest {
     @Mock private RefreshTokenRepository refreshTokenRepository;
     @Mock private JwtService jwtService;
     @Mock private PasswordEncoder passwordEncoder;
+    @Mock private UserServiceClient userServiceClient;
 
     @InjectMocks
-    private AuthService authService;
+    private AuthServiceImpl authService;
 
     @BeforeEach
     void setUp() {
@@ -59,6 +61,7 @@ class AuthServiceTest {
         assertThat(response.getAccessToken()).isEqualTo("access-token");
         assertThat(response.getTokenType()).isEqualTo("Bearer");
         verify(userRepository).save(any(User.class));
+        verify(userServiceClient).createUserProfile(any(), anyString(), anyString());
     }
 
     @Test

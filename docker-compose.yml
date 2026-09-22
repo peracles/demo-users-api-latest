@@ -56,6 +56,7 @@ services:
       SPRING_DATASOURCE_USERNAME: auth_user
       SPRING_DATASOURCE_PASSWORD: auth_password
       JWT_KEYS_DIR: /app/keys
+      USER_SERVICE_URL: http://user-service:8080
     volumes:
       - jwt-keys:/app/keys
     depends_on:
@@ -64,17 +65,18 @@ services:
 
   user-service:
     build:
-      context: ./user-service
+      context: ./user-service/UserApi
       dockerfile: Dockerfile
     container_name: demo-user-service
     restart: unless-stopped
     ports:
-      - "8082:8082"
+      - "8082:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-users:5432/users_db
-      SPRING_DATASOURCE_USERNAME: users_user
-      SPRING_DATASOURCE_PASSWORD: users_password
-      JWT_KEYS_DIR: /app/keys
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      URLS: http://+:8080
+      ConnectionStrings__UsersDb: Host=postgres-users;Port=5432;Database=users_db;Username=users_user;Password=users_password
+      JwtKeysDir: /app/keys
     volumes:
       - jwt-keys:/app/keys
     depends_on:
@@ -107,13 +109,13 @@ services:
     restart: unless-stopped
     ports:
       - "4200:4200"
-    volumes:
-      - ./frontend:/app
-      - frontend_node_modules:/app/node_modules
-    command: pnpm start --host 0.0.0.0
 
 volumes:
   postgres_auth_data:
   postgres_users_data:
   jwt-keys:
   frontend_node_modules:
+
+networks:
+  default:
+    name: demo-network
