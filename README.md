@@ -1,9 +1,9 @@
 # Demo Users API - Microservicios con Docker
 
-![Status](https://img.shields.io/badge/status-active-success.svg)
+![Status](https://img.shields.io/badge/status-complete-success.svg)
 ![Auth Service](https://img.shields.io/badge/Auth%20Service-✅%20Complete-blue)
 ![User Service](https://img.shields.io/badge/User%20Service-✅%20Complete-blue)
-![Frontend](https://img.shields.io/badge/Frontend-%F0%9F%9A%A7%20Pending-orange)
+![Frontend](https://img.shields.io/badge/Frontend-✅%20Complete-blue)
 
 Aplicación de demostración con arquitectura de microservicios para práctica y entrevistas técnicas.
 
@@ -13,17 +13,43 @@ Aplicación de demostración con arquitectura de microservicios para práctica y
 |---|---|---|
 | **Auth Service** | ✅ Completo | Java 25 + Spring Boot 4.1 + JWT RS256 |
 | **User Service** | ✅ Completo | .NET 10 + EF Core 10 + GraphQL |
-| **Frontend** | 🚧 Pendiente | Angular 22 + Tailwind CSS v4 |
+| **Frontend** | ✅ Completo | Angular 22 + Tailwind CSS v4 + shadcn UI |
 | **Infrastructure** | ✅ Completo | Docker + NGINX + PostgreSQL 17 |
 
 ## Stack Tecnológico
 
 - **Auth Service:** Java 25 + Spring Boot 4.1 + JWT RS256
-- **User Service:** .NET 10 + Entity Framework Core 10 + GraphQL
-- **Frontend:** Angular 22 + Tailwind CSS v4
-- **API Gateway:** NGINX
-- **Base de Datos:** PostgreSQL 17
+- **User Service:** .NET 10 + Entity Framework Core 10 + GraphQL (HotChocolate)
+- **Frontend:** Angular 22 + Tailwind CSS v4 + Componentes shadcn-style
+- **API Gateway:** NGINX 1.27
+- **Base de Datos:** PostgreSQL 17 (database-per-service)
 - **Containerización:** Docker + Docker Compose
+
+## Frontend - Componentes UI
+
+El frontend incluye una librería de componentes reutilizables inspirados en shadcn/ui:
+
+| Componente | Selector | Descripción |
+|---|---|---|
+| **Button** | `<ui-button>` | 6 variantes (default, destructive, outline, secondary, ghost, link), 4 tamaños |
+| **Input** | `<ui-input>` | Input con ControlValueAccessor para reactive forms |
+| **Textarea** | `<ui-textarea>` | Textarea con ControlValueAccessor |
+| **Label** | `<ui-label>` | Label estilizado para formularios |
+| **Card** | `<ui-card>` | Card con Header, Title, Description, Content, Footer |
+| **Dialog** | `<ui-dialog>` | Modal con backdrop y animación |
+| **Avatar** | `<ui-avatar>` | Avatar circular con iniciales (3 tamaños) |
+| **Badge** | `<ui-badge>` | Badge para roles/status (4 variantes) |
+| **Alert** | `<ui-alert>` | Alertas (default, destructive) |
+
+### Funcionalidades del Frontend
+
+- **Login/Register** con validación de formularios y manejo de errores
+- **Dashboard** con lista de usuarios en grid responsivo
+- **Edición de perfil** con modal y validación
+- **Eliminación de usuarios** con confirmación
+- **Guards de autenticación** para rutas protegidas
+- **Interceptor HTTP** para JWT token y refresh automático
+- **Permisos** basados en rol (ADMIN) o ownership
 
 ## Arquitectura
 
@@ -48,13 +74,35 @@ Aplicación de demostración con arquitectura de microservicios para práctica y
      └─────────────────┘       └─────────────────┘
 ```
 
-## Requisitos
+## Requisitos para Correr el Proyecto
 
-- Docker Desktop 29+ (Windows/Mac/Linux)
-- Docker Compose v5+
-- (Opcional) Java 25 + Maven 3.9+ para desarrollo local del auth-service
-- (Opcional) .NET 10 SDK para desarrollo local del user-service
-- (Opcional) Node.js 20+ + pnpm 10+ para desarrollo del frontend
+### Opción 1: Solo Docker (Recomendado - Todo incluido)
+
+Solo necesitas Docker Desktop instalado. Todo lo demás corre dentro de contenedores.
+
+- **Docker Desktop** 24+ (Windows/Mac/Linux)
+- **Docker Compose** v2+ (incluido en Docker Desktop)
+
+### Opción 2: Desarrollo Local (Sin Docker)
+
+Si quieres correr los servicios individualmente para desarrollo:
+
+| Servicio | Requisitos |
+|---|---|
+| **Auth Service** | Java 25 (Oracle JDK o OpenJDK) + Maven 3.9+ |
+| **User Service** | .NET 10 SDK |
+| **Frontend** | Node.js 22+ + npm 10+ |
+| **Bases de Datos** | PostgreSQL 17 (o usar Docker solo para las DBs) |
+
+### Versiones Confirmadas
+
+| Herramienta | Versión | Notas |
+|---|---|---|
+| Docker Desktop | 29+ | Windows/Mac/Linux |
+| Java | 25 | Oracle JDK o OpenJDK |
+| .NET SDK | 10.0.401 | LTS hasta Nov 2028 |
+| Node.js | 22 | Para el frontend |
+| PostgreSQL | 17 | Via Docker o local |
 
 ## Instalación Rápida con Docker
 
@@ -95,9 +143,19 @@ demo-frontend           Up
 
 ### 4. Acceder a la aplicación
 
-- **Frontend:** http://localhost:8880 (o el puerto que hayas configurado en nginx)
-- **Auth API:** http://localhost:8880/api/auth/*
-- **GraphQL:** http://localhost:8880/graphql
+| Servicio | URL | Descripción |
+|---|---|---|
+| **Frontend** | http://localhost:4200 | Aplicación Angular (acceso directo) |
+| **API Gateway** | http://localhost:8880 | NGINX proxy (rutea a todos los servicios) |
+| **Auth API** | http://localhost:8880/api/auth/* | Endpoints de autenticación |
+| **GraphQL** | http://localhost:8880/graphql | API de usuarios |
+| **Auth Service** | http://localhost:8081 | Microservicio Java (desarrollo) |
+| **User Service** | http://localhost:8082 | Microservicio .NET (desarrollo) |
+
+**Flujo recomendado:**
+1. Abre http://localhost:4200 para usar la aplicación
+2. Login con `admin@demo.com` / `admin123` para acceso completo
+3. O usa http://localhost:8880 para pasar por el API Gateway
 
 ### 5. Ver logs
 
@@ -161,11 +219,17 @@ Accede en: http://localhost:8082
 
 ```powershell
 cd frontend
-pnpm install
-pnpm start
+npm install
+npm start
 ```
 
+El comando `npm start` automaticamente:
+1. Genera el CSS de Tailwind (`npm run tailwind`)
+2. Inicia el servidor de desarrollo de Angular
+
 Accede en: http://localhost:4200
+
+**Nota:** El proyecto usa `@tailwindcss/cli` para generar el CSS antes del build. Los scripts `prebuild` y `prestart` en `package.json` ejecutan esto automaticamente.
 
 ## Pruebas Automatizadas
 
@@ -267,6 +331,14 @@ demo-users-api-latest/
 │   ├── UserApi/               # API principal
 │   └── UserApi.Tests/         # Pruebas unitarias
 ├── frontend/                   # Aplicación Angular
+│   ├── src/app/
+│   │   ├── components/        # Login, Register, Dashboard
+│   │   ├── shared/ui/         # Componentes shadcn-style
+│   │   ├── services/          # AuthService, UserService
+│   │   ├── guards/            # Auth guard
+│   │   └── interceptors/      # JWT interceptor
+│   ├── tailwind.input.css     # Entry point para Tailwind CLI
+│   └── package.json           # Scripts con prebuild/prestart
 ├── init-scripts/
 │   ├── auth-db/                # Scripts de inicialización para auth DB
 │   └── users-db/               # Scripts de inicialización para users DB
@@ -280,6 +352,15 @@ demo-users-api-latest/
 - **QWEN.md** - Especificaciones técnicas completas del proyecto
 - **PLAN.md** - Plan de implementación y estado actual de cada componente
 - **SETUP.md** - Instrucciones paso a paso para instalación y configuración
+
+## Características de Seguridad
+
+- **JWT RS256** - Firma asimétrica con RSA 2048-bit
+- **Refresh Token Rotation** - One-time use, invalida el token anterior
+- **BCrypt** - Hashing de passwords con cost factor 12
+- **Database-per-service** - Cada microservicio tiene su propia base de datos
+- **API Gateway** - NGINX como punto único de entrada
+- **Authorization** - Permisos basados en rol (ADMIN) o ownership
 
 ## Troubleshooting
 
