@@ -3,8 +3,8 @@ import { Component, Input } from '@angular/core';
 type AlertVariant = 'default' | 'destructive';
 
 const variantClasses: Record<AlertVariant, string> = {
-  default: 'bg-background text-foreground',
-  destructive: 'border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive',
+  default: 'bg-white text-slate-900 border-slate-200',
+  destructive: 'border-red-200 bg-red-50 text-red-700',
 };
 
 @Component({
@@ -21,7 +21,7 @@ export class AlertComponent {
 
   get alertClasses(): string {
     return [
-      'relative w-full rounded-lg border border-border p-4 text-sm',
+      'relative w-full rounded-lg border p-4 text-sm',
       variantClasses[this.variant],
     ].join(' ');
   }

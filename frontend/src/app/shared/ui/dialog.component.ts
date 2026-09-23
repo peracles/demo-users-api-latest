@@ -7,11 +7,11 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
     @if (open) {
       <div class="fixed inset-0 z-50 flex items-center justify-center">
         <div
-          class="fixed inset-0 bg-black/80 animate-in fade-in-0"
+          class="fixed inset-0 bg-black/80"
           (click)="closed.emit()"
         ></div>
         <div
-          class="relative z-50 w-full max-w-lg mx-4 bg-background rounded-lg border border-border shadow-lg p-6"
+          class="relative z-50 w-full max-w-lg mx-4 bg-white rounded-lg border border-slate-200 shadow-lg p-6"
         >
           <ng-content />
         </div>

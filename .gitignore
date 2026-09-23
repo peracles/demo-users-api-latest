@@ -19,6 +19,7 @@ keys/
 frontend/node_modules/
 frontend/dist/
 frontend/.angular/
+frontend/src/tailwind.generated.css
 
 # IDE
 .idea/

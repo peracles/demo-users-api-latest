@@ -37,7 +37,7 @@ import {
     AlertComponent,
   ],
   template: `
-    <div class="min-h-screen flex items-center justify-center px-4 bg-muted/40">
+    <div class="min-h-screen flex items-center justify-center px-4 bg-slate-50">
       <ui-card class="w-full max-w-md">
         <ui-card-header class="text-center">
           <ui-card-title>Crear Cuenta</ui-card-title>
@@ -59,10 +59,10 @@ import {
                 placeholder="carlos"
               />
               @if (form.get('username')?.touched && form.get('username')?.errors?.['required']) {
-                <p class="text-destructive text-xs">Username es requerido</p>
+                <p class="text-red-600 text-xs">Username es requerido</p>
               }
               @if (form.get('username')?.errors?.['minlength']) {
-                <p class="text-destructive text-xs">Minimo 3 caracteres</p>
+                <p class="text-red-600 text-xs">Minimo 3 caracteres</p>
               }
             </div>
 
@@ -74,7 +74,7 @@ import {
                 placeholder="carlos@demo.com"
               />
               @if (form.get('email')?.touched && form.get('email')?.errors?.['email']) {
-                <p class="text-destructive text-xs">Email invalido</p>
+                <p class="text-red-600 text-xs">Email invalido</p>
               }
             </div>
 
@@ -86,7 +86,7 @@ import {
                 placeholder="minimo 6 caracteres"
               />
               @if (form.get('password')?.touched && form.get('password')?.errors?.['minlength']) {
-                <p class="text-destructive text-xs">Minimo 6 caracteres</p>
+                <p class="text-red-600 text-xs">Minimo 6 caracteres</p>
               }
             </div>
 
@@ -100,9 +100,9 @@ import {
           </form>
         </ui-card-content>
         <ui-card-footer>
-          <p class="text-sm text-muted-foreground">
+          <p class="text-sm text-slate-500">
             Ya tienes cuenta?
-            <a routerLink="/login" class="text-primary hover:underline font-medium">
+            <a routerLink="/login" class="text-indigo-600 hover:underline font-medium">
               Inicia sesion
             </a>
           </p>

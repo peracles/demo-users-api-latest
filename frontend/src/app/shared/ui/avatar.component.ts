@@ -28,7 +28,7 @@ export class AvatarComponent {
     };
     return [
       'relative flex shrink-0 overflow-hidden rounded-full',
-      'bg-primary/10 text-primary font-medium items-center justify-center',
+      'bg-indigo-100 text-indigo-600 font-medium items-center justify-center',
       sizes[this.size],
     ].join(' ');
   }

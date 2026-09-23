@@ -54,26 +54,26 @@ export class UserService {
   }
 
   updateUser(id: string, input: UpdateUserInput): Observable<UserProfile> {
-    const mutation = `mutation ($id: UUID!, $input: UpdateUserInput!) {
+    const query = `mutation ($id: UUID!, $input: UpdateUserInput!) {
       updateUser(id: $id, input: $input) {
         id userId firstName lastName phone avatarUrl bio createdAt updatedAt
       }
     }`;
     return this.http
       .post<{ data: { updateUser: UserProfile } }>(this.GQL, {
-        mutation,
+        query,
         variables: { id, input },
       })
       .pipe(map((res) => res.data.updateUser));
   }
 
   deleteUser(id: string): Observable<boolean> {
-    const mutation = `mutation ($id: UUID!) {
+    const query = `mutation ($id: UUID!) {
       deleteUser(id: $id)
     }`;
     return this.http
       .post<{ data: { deleteUser: boolean } }>(this.GQL, {
-        mutation,
+        query,
         variables: { id },
       })
       .pipe(map((res) => res.data.deleteUser));

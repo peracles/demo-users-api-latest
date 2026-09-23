@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "tailwind": "tailwindcss -i tailwind.input.css -o src/tailwind.generated.css --minify",
+    "prebuild": "npm run tailwind",
+    "prestart": "npm run tailwind",
     "start": "ng serve --host 0.0.0.0",
     "build": "ng build",
     "test": "ng test"
@@ -22,9 +25,10 @@
     "@angular/build": "^22.0.0",
     "@angular/cli": "^22.0.0",
     "@angular/compiler-cli": "^22.0.0",
-    "tailwindcss": "^4.0.0",
+    "@tailwindcss/cli": "^4.3.3",
     "@tailwindcss/postcss": "^4.0.0",
     "postcss": "^8.5.0",
+    "tailwindcss": "^4.0.0",
     "typescript": "~6.0.0"
   }
 }
