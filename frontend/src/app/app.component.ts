@@ -9,11 +9,11 @@ import { ButtonComponent } from './shared/ui';
   imports: [RouterOutlet, RouterLink, ButtonComponent],
   template: `
     @if (authService.isAuthenticated()) {
-      <nav class="border-b border-border bg-background">
+      <nav class="border-b border-slate-200 bg-white">
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-          <a routerLink="/dashboard" class="text-xl font-bold tracking-tight">Users API Demo</a>
+          <a routerLink="/dashboard" class="text-xl font-bold tracking-tight text-slate-900">Users API Demo</a>
           <div class="flex items-center gap-4">
-            <span class="text-sm text-muted-foreground">{{ authService.getUser()?.email }}</span>
+            <span class="text-sm text-slate-500">{{ authService.getUser()?.email }}</span>
             <ui-button variant="outline" size="sm" (btnClick)="onLogout()">
               Logout
             </ui-button>

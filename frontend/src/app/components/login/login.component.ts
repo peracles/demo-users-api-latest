@@ -37,7 +37,7 @@ import {
     AlertComponent,
   ],
   template: `
-    <div class="min-h-screen flex items-center justify-center px-4 bg-muted/40">
+    <div class="min-h-screen flex items-center justify-center px-4 bg-slate-50">
       <ui-card class="w-full max-w-md">
         <ui-card-header class="text-center">
           <ui-card-title>Iniciar Sesion</ui-card-title>
@@ -79,13 +79,13 @@ import {
           </form>
         </ui-card-content>
         <ui-card-footer class="flex-col space-y-2">
-          <p class="text-sm text-muted-foreground">
+          <p class="text-sm text-slate-500">
             No tienes cuenta?
-            <a routerLink="/register" class="text-primary hover:underline font-medium">
+            <a routerLink="/register" class="text-indigo-600 hover:underline font-medium">
               Registrate
             </a>
           </p>
-          <div class="w-full mt-2 p-3 bg-muted rounded-md text-xs text-muted-foreground">
+          <div class="w-full mt-2 p-3 bg-slate-100 rounded-md text-xs text-slate-500">
             <p class="font-semibold mb-1">Usuarios demo:</p>
             <p>admin&#64;demo.com / admin123 (ADMIN)</p>
             <p>carlos&#64;demo.com / user123 (USER)</p>

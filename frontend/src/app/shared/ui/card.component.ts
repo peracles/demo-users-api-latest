@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
   selector: 'ui-card',
   standalone: true,
   template: `
-    <div class="rounded-lg border border-border bg-card text-card-foreground shadow-sm">
+    <div class="rounded-lg border border-slate-200 bg-white text-slate-900 shadow-sm">
       <ng-content />
     </div>
   `,
@@ -28,7 +28,7 @@ export class CardTitleComponent {}
 @Component({
   selector: 'ui-card-description',
   standalone: true,
-  template: `<p class="text-sm text-muted-foreground"><ng-content /></p>`,
+  template: `<p class="text-sm text-slate-500"><ng-content /></p>`,
 })
 export class CardDescriptionComponent {}
 

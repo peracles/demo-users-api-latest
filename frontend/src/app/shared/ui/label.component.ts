@@ -13,6 +13,6 @@ export class LabelComponent {
   @Input() htmlFor = '';
 
   get labelClasses(): string {
-    return 'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground';
+    return 'text-sm font-medium leading-none text-slate-900 peer-disabled:cursor-not-allowed peer-disabled:opacity-70';
   }
 }

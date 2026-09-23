@@ -43,8 +43,8 @@ import {
     <div class="max-w-6xl mx-auto px-4 py-8">
       <div class="mb-8 flex items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold tracking-tight text-foreground">Dashboard</h1>
-          <p class="text-muted-foreground mt-1">
+          <h1 class="text-3xl font-bold tracking-tight text-slate-900">Dashboard</h1>
+          <p class="text-slate-500 mt-1">
             Bienvenido, {{ currentUser()?.firstName }}
           </p>
         </div>
@@ -53,7 +53,7 @@ import {
 
       @if (loading()) {
         <div class="text-center py-12">
-          <p class="text-muted-foreground">Cargando usuarios...</p>
+          <p class="text-slate-500">Cargando usuarios...</p>
         </div>
       } @else if (error()) {
         <ui-alert variant="destructive">
@@ -67,27 +67,27 @@ import {
                 <div class="flex items-center gap-3 mb-3">
                   <ui-avatar [firstName]="user.firstName" [lastName]="user.lastName" />
                   <div>
-                    <h3 class="font-semibold leading-none text-foreground">
+                    <h3 class="font-semibold leading-none text-slate-900">
                       {{ user.firstName }} {{ user.lastName }}
                     </h3>
                     @if (user.phone) {
-                      <p class="text-sm text-muted-foreground mt-0.5">{{ user.phone }}</p>
+                      <p class="text-sm text-slate-500 mt-0.5">{{ user.phone }}</p>
                     }
                   </div>
                 </div>
                 @if (user.bio) {
-                  <p class="text-sm text-muted-foreground mb-3">{{ user.bio }}</p>
+                  <p class="text-sm text-slate-500 mb-3">{{ user.bio }}</p>
                 }
-                <div class="flex items-center gap-2 pt-3 border-t border-border">
+                <div class="flex items-center gap-2 pt-3 border-t border-slate-100">
                   @if (canEdit(user)) {
                     <ui-button variant="ghost" size="sm" (btnClick)="openEdit(user)">
                       Editar
                     </ui-button>
                     <ui-button variant="ghost" size="sm" (btnClick)="onDelete(user)">
-                      <span class="text-destructive">Eliminar</span>
+                      <span class="text-red-600">Eliminar</span>
                     </ui-button>
                   }
-                  <span class="text-xs text-muted-foreground ml-auto">
+                  <span class="text-xs text-slate-400 ml-auto">
                     {{ user.createdAt | date: 'shortDate' }}
                   </span>
                 </div>
@@ -128,11 +128,19 @@ import {
             </div>
           </div>
 
+          @if (saveError) {
+            <ui-alert variant="destructive" class="mt-4">
+              {{ saveError }}
+            </ui-alert>
+          }
+
           <ui-dialog-footer>
-            <ui-button variant="outline" type="button" (btnClick)="showEditModal.set(false)">
+            <ui-button variant="outline" type="button" (btnClick)="cancelEdit()">
               Cancelar
             </ui-button>
-            <ui-button type="submit">Guardar</ui-button>
+            <ui-button type="submit" [disabled]="saving">
+              @if (saving) { Guardando... } @else { Guardar }
+            </ui-button>
           </ui-dialog-footer>
         </form>
       </ui-dialog>
@@ -149,6 +157,8 @@ export class DashboardComponent implements OnInit {
   error = signal('');
   showEditModal = signal(false);
   currentUser = signal<{ firstName: string; userId: string; role: string } | null>(null);
+  saving = false;
+  saveError = '';
 
   private editingUser: UserProfile | null = null;
 
@@ -191,7 +201,10 @@ export class DashboardComponent implements OnInit {
   }
 
   onSaveEdit(): void {
-    if (!this.editingUser) return;
+    if (!this.editingUser || this.editForm.invalid) return;
+    this.saving = true;
+    this.saveError = '';
+
     const input: UpdateUserInput = {
       ...(this.editForm.value.firstName && {
         firstName: this.editForm.value.firstName,
@@ -208,10 +221,23 @@ export class DashboardComponent implements OnInit {
 
     this.userService
       .updateUser(this.editingUser.id, input)
-      .subscribe(() => {
-        this.showEditModal.set(false);
-        this.loadUsers();
+      .subscribe({
+        next: () => {
+          this.saving = false;
+          this.showEditModal.set(false);
+          this.loadUsers();
+        },
+        error: (err) => {
+          this.saving = false;
+          this.saveError = err.error?.message || 'Error al guardar cambios';
+        },
       });
+  }
+
+  cancelEdit(): void {
+    this.showEditModal.set(false);
+    this.saveError = '';
+    this.saving = false;
   }
 
   onDelete(user: UserProfile): void {
